@@ -39,16 +39,15 @@ class Pdo implements HandlerInterface
      */
     public function __construct(array $options = array())
     {
-
         if(!isset($options['dsn']))
         {
             // this is bad. do something!
         }
 
-        $dsn = $options['dsn'];
+        $this->dsn = $options['dsn'];
 
-        $username = isset($options['username']) ? $options['username'] : null;
-        $password = isset($options['[password']) ? $options['password'] : null;
+        $this->username = isset($options['username']) ? $options['username'] : null;
+        $this->password = isset($options['[password']) ? $options['password'] : null;
 
         if(isset($options['options']))
         {
@@ -56,8 +55,9 @@ class Pdo implements HandlerInterface
             {
                 // this is also bad, do something!
             }
-        }
 
+            $this->options = $options['options'];
+        }
 
     }
 
@@ -82,7 +82,8 @@ class Pdo implements HandlerInterface
      */
     public function getData($key)
     {
-
+        if(!($dbh = $this->getConnection()))
+            return false;
     }
 
     /**
@@ -100,7 +101,8 @@ class Pdo implements HandlerInterface
      */
     public function storeData($key, $data, $expiration)
     {
-
+        if(!($dbh = $this->getConnection()))
+            return false;
     }
 
     /**
@@ -112,7 +114,8 @@ class Pdo implements HandlerInterface
      */
     public function clear($key = null)
     {
-
+        if(!($dbh = $this->getConnection()))
+            return false;
     }
 
     /**
@@ -122,7 +125,8 @@ class Pdo implements HandlerInterface
      */
     public function purge()
     {
-
+        if(!($dbh = $this->getConnection()))
+            return false;
     }
 
     /**
@@ -135,9 +139,48 @@ class Pdo implements HandlerInterface
 
     }
 
+    protected function getConnection($create = true)
+    {
+        if($this->connection === false)
+        {
+            if($create === false)
+                return false;
+
+            try{
+                $dbh = new PDO($this->dsn, $this->username, $this->password, $this->options);
+                $this->connection = $dbh;
+
+                // initialize database
+
+
+
+            }catch(Exception $e){
+                return false;
+            }
+       }
+
+       return $this->connection;
+    }
 
     protected function makeKey($key)
     {
+        $kparts = explode('/', $key);
+        $newKey = '';
+        foreach($kparts as $piece)
+        {
+            if(isset($this->keyindex[$piece]))
+            {
+                $newKey .= '/' . $this->keyindex[$piece];
+                continue;
+            }else{
 
+                // get key id from database
+
+                // add key to database if it doesn't exist
+
+            }
+        }
+
+        return $key;
     }
 }

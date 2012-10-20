@@ -55,6 +55,8 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
             $this->startTime = time();
             $this->expiration = $this->startTime + 3600;
             $this->data['object'] = new \stdClass();
+            $this->data['largefloat'] = exp(350);
+            $this->data['largenegfloat'] = $this->data['largefloat'] * -1;
         }
     }
 
