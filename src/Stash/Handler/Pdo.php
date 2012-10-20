@@ -187,10 +187,11 @@ class Pdo implements HandlerInterface
 
         foreach($kparts as $piece)
         {
-            if(!isset($this->keyindex[$piece]))
+            $npiece = md5($piece);
+            if(!isset($this->keyindex[$npiece]))
             {
                 // Check to see if key is already mapped
-                $selectStmt->execute(array($piece));
+                $selectStmt->execute(array($npiece));
                 $row = $selectStmt->fetch();
 
                 if($row !== false && isset($row['keyId']))
@@ -199,8 +200,8 @@ class Pdo implements HandlerInterface
                 }else{
 
                     // key is not mapped, so insert it and get the new id.
-                    $insertStmt->execute(array($piece));
-                    $selectStmt->execute(array($piece));
+                    $insertStmt->execute(array($npiece));
+                    $selectStmt->execute(array($npiece));
 
                     $row = $selectStmt->fetch();
                     if($row === false || !isset($row['keyId']))
@@ -210,7 +211,7 @@ class Pdo implements HandlerInterface
                 }
 
                 $keyId = dechex($keyId);
-                $this->keyindex[$piece] = $keyId;
+                $this->keyindex[$npiece] = $keyId;
             }
 
 
