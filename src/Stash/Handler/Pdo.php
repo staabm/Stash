@@ -84,6 +84,8 @@ class Pdo implements HandlerInterface
     {
         if(!($dbh = $this->getConnection()))
             return false;
+
+        $key = $this->makeKey($key);
     }
 
     /**
@@ -103,6 +105,8 @@ class Pdo implements HandlerInterface
     {
         if(!($dbh = $this->getConnection()))
             return false;
+
+        $key = $this->makeKey($key);
     }
 
     /**
@@ -116,6 +120,14 @@ class Pdo implements HandlerInterface
     {
         if(!($dbh = $this->getConnection()))
             return false;
+
+        if(isset($key))
+        {
+            $key = $this->makeKey($key);
+        }else{
+            // delete all the things
+        }
+
     }
 
     /**
@@ -147,7 +159,7 @@ class Pdo implements HandlerInterface
                 return false;
 
             try{
-                $dbh = new PDO($this->dsn, $this->username, $this->password, $this->options);
+                $dbh = new \PDO($this->dsn, $this->username, $this->password, $this->options);
                 $this->connection = $dbh;
 
                 // initialize database
@@ -166,21 +178,45 @@ class Pdo implements HandlerInterface
     {
         $kparts = explode('/', $key);
         $newKey = '';
+
+        if(!($dbh = $this->getConnection()))
+            return false;
+
+        $selectStmt = $dbh->prepare('SELECT keyId FROM KeyMaps WHERE keyName = ?');
+        $insertStmt = $dbh->prepare('INSERT INTO KeyMaps (keyName) VALUES (?)');
+
         foreach($kparts as $piece)
         {
-            if(isset($this->keyindex[$piece]))
+            if(!isset($this->keyindex[$piece]))
             {
-                $newKey .= '/' . $this->keyindex[$piece];
-                continue;
-            }else{
+                // Check to see if key is already mapped
+                $selectStmt->execute(array($piece));
+                $row = $selectStmt->fetch();
 
-                // get key id from database
+                if($row !== false && isset($row['keyId']))
+                {
+                    $keyId = $row['keyId'];
+                }else{
 
-                // add key to database if it doesn't exist
+                    // key is not mapped, so insert it and get the new id.
+                    $insertStmt->execute(array($piece));
+                    $selectStmt->execute(array($piece));
 
+                    $row = $selectStmt->fetch();
+                    if($row === false || !isset($row['keyId']))
+                        return false;
+
+                    $keyId = $row['keyId'];
+                }
+
+                $keyId = dechex($keyId);
+                $this->keyindex[$piece] = $keyId;
             }
+
+
+            $newKey .= '/' . $this->keyindex[$piece];
         }
 
-        return $key;
+        return $newKey;
     }
 }
