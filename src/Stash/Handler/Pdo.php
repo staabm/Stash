@@ -39,26 +39,31 @@ class Pdo implements HandlerInterface
      */
     public function __construct(array $options = array())
     {
-        if(!isset($options['dsn']))
+        if(isset($options['pdo']) && $options['pdo'] instanceof \PDO)
         {
-            // this is bad. do something!
-        }
+            $this->connection = $options['pdo'];
+        }else{
 
-        $this->dsn = $options['dsn'];
-
-        $this->username = isset($options['username']) ? $options['username'] : null;
-        $this->password = isset($options['[password']) ? $options['password'] : null;
-
-        if(isset($options['options']))
-        {
-            if(!is_array($options['options']))
+            if(!isset($options['dsn']))
             {
-                // this is also bad, do something!
+                // this is bad. do something!
             }
 
-            $this->options = $options['options'];
-        }
+            $this->dsn = $options['dsn'];
 
+            $this->username = isset($options['username']) ? $options['username'] : null;
+            $this->password = isset($options['[password']) ? $options['password'] : null;
+
+            if(isset($options['options']))
+            {
+                if(!is_array($options['options']))
+                {
+                    // this is also bad, do something!
+                }
+
+                $this->options = $options['options'];
+            }
+        }
     }
 
     /**
