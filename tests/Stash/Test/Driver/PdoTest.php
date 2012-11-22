@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Stash\Test\Handler;
+namespace Stash\Test\Driver;
 
-use Stash\Handler\Sqlite;
-use Stash\Cache;
+use Stash\Driver\Pdo;
+use Stash\Item;
 use Stash\Utilities;
 
 /**
@@ -21,7 +21,7 @@ use Stash\Utilities;
  */
 class PdoTest extends \PHPUnit_Framework_TestCase
 {
-    protected $handlerClass = 'Stash\Handler\Pdo';
+    protected $handlerClass = 'Stash\Driver\Pdo';
 
     protected function setUp()
     {

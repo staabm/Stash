@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Stash\Handler;
+namespace Stash\Driver;
 
 use Stash;
 use Stash\Exception\RuntimeException;
@@ -21,7 +21,7 @@ use Stash\Exception\RuntimeException;
  * @package Stash
  * @author  Robert Hafner <tedivm@tedivm.com>
  */
-class Pdo implements HandlerInterface
+class Pdo implements DriverInterface
 {
     protected $dsn;
     protected $username;
